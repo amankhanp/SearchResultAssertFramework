@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
@@ -30,7 +29,7 @@ public class SearchSteps {
 
     @Given("I navigate to {string} home page")
     public void iNavigateToHomePage(String browserName) {
-        googleSearchPage.navigateToGoogleHomePage(browserName);
+        googleSearchPage.navigateToSearchPage(browserName);
     }
 
     @When("I search {string} on Google Search Engine")
@@ -38,21 +37,14 @@ public class SearchSteps {
         googleSearchPage.performGoogleSearch(searchKeyword);
     }
 
-    @Given("I navigate to {string} bing page")
-    public void iNavigateToBingPage(String browserName) {
-        bingSearchPage.navigateToBingHomePage(browserName);
-    }
-
     @When("I search {string} on Bing Search Engine")
     public void iSearchOnBingSearchEngine(String searchKeyword) {
         bingSearchPage.performBingSearch(searchKeyword);
     }
 
-    @Then("the search results should contain the keyword {string} then click on it")
-    public void validateSearchResults(String keyword) {
-        List<WebElement> textResults = googleSearchPage.lnkSearchResult.stream()
-                .filter(result -> result.getText().toLowerCase().contains(keyword.toLowerCase()))
-                .collect(Collectors.toList());
+    @Then("the {string} results should contain the keyword {string} then click on it")
+    public void validateAndClickSearchResult(String searchEngine, String keyword) {
+        List<WebElement> textResults = getSearchResults(searchEngine);
 
         assertTrue("The expected text is not present in search results",
                 textResults.stream().anyMatch(result -> {
@@ -64,19 +56,14 @@ public class SearchSteps {
                 }));
     }
 
-    @Then("the bing results should contain the keyword {string} then click on it")
-    public void validateBingSearchResults(String keyword) {
-        List<WebElement> textResults = bingSearchPage.lnkSearchResult.stream()
-                .filter(result -> result.getText().toLowerCase().contains(keyword.toLowerCase()))
-                .collect(Collectors.toList());
-
-        assertTrue("The expected text is not present in search results",
-                textResults.stream().anyMatch(result -> {
-                    if (result.getText().toLowerCase().contains(keyword.toLowerCase())) {
-                        result.click();
-                        return true;
-                    }
-                    return false;
-                }));
+    private List<WebElement> getSearchResults(String searchEngine) {
+        switch (searchEngine.toLowerCase()) {
+            case "google":
+                return googleSearchPage.lnkSearchResult;
+            case "bing":
+                return bingSearchPage.lnkSearchResult;
+            default:
+                throw new IllegalArgumentException("Unsupported search engine: " + searchEngine);
+        }
     }
 }

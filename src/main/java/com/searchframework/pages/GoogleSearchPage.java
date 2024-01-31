@@ -1,6 +1,5 @@
 package com.searchframework.pages;
 
-import com.searchframework.wrappers.BrowserActions;
 import com.searchframework.wrappers.WebElementActions;
 import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.WebElement;
@@ -16,9 +15,6 @@ import java.util.List;
 public class GoogleSearchPage extends BasePage {
 
     @Autowired
-    public BrowserActions browserActions;
-
-    @Autowired
     public WebElementActions WebElementActions;
 
     @FindBy(how = How.XPATH, using = "//textarea[@title='Search']")
@@ -32,10 +28,6 @@ public class GoogleSearchPage extends BasePage {
 
     @FindBy(how = How.CSS, using = "h3")
     public List<WebElement> lnkSearchResult;
-
-    public void navigateToGoogleHomePage(String browserName) {
-        browserActions.openBrowser(browserName);
-    }
 
     public void performGoogleSearch(String searchText) {
         Assert.isTrue(WebElementActions.isElementVisible(txtGoogleSearch), "google search text box is not present");
